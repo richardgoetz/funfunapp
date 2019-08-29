@@ -1,21 +1,14 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/repo
     docker:
-      - image: circleci/python:3.7
-        environment:
+      - image: circleci/python:37
     steps:
+      - checkout
+      - run: pip install -r requirements-dev.txt
       - run:
+          name: Install Python deps in a venv
           command: |
-            sudo pip install pipenv
-            pipenv install
-  test:
-      - run:
-          command: |
-            pipenv run python manage.py test
-      - store_test_results:
-          path: test-results
-      - store_artifacts:
-          path: test-results
-          destination: tr1
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements-dev.txt
