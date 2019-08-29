@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: pip install -r requirements-dev.txt
+      - run: sudo pip install -r requirements-dev.txt
       - run:
           name: Install Python deps in a venv
           command: |
