@@ -23,7 +23,6 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m
             sudo pip install --requirement requirements-dev.txt --upgrade
 
 
