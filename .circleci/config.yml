@@ -27,19 +27,11 @@ jobs:
             sudo pip install --requirement requirements-dev.txt --upgrade
 
 
-
-      # run tests!
-      # this example uses Django's built-in test-runner
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
-      jobs:
       - run:
           command: |
-                pipenv run python manage.py test
+            sudo pip install pipenv
+            pipenv install
 
-
-
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
+      - run:
+          command: |
+            pipenv run python manage.py test
