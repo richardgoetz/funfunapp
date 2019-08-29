@@ -33,10 +33,14 @@ jobs:
       # other common Python testing frameworks include pytest and nose
       # https://pytest.org
       # https://nose.readthedocs.io
-      - run:
-          name: run tests
-          command: |
-          pipenv run python manage.py test
+      jobs:
+          build:
+    # ...
+            steps:
+      # ...
+              - run:
+                command: |
+                pipenv run python manage.py test
 
 
 
