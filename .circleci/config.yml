@@ -34,12 +34,8 @@ jobs:
       # https://pytest.org
       # https://nose.readthedocs.io
       jobs:
-          build:
-    # ...
-            steps:
-      # ...
-              - run:
-                command: |
+      - run:
+          command: |
                 pipenv run python manage.py test
 
 
