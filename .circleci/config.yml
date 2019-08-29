@@ -30,6 +30,9 @@ jobs:
           command: |
             sudo pip install pipenv
             pipenv install
+            sudo pip install manage.py
+
+
 
       - run:
           command: |
