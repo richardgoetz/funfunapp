@@ -1,73 +1,21 @@
 version: 2
-build:
-  docker:
-    - image:  circleci/python:3.7
-  steps:
-    - checkout
-    - run:
-        command: |
-          apk update && apk upgrade && apk add git
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          python ./get_repos.py $ENVIRONMENT
 jobs:
-  test:
+  build:
+    working_directory: ~/repo
     docker:
-      - image:circleci/python:3.7
-    steps:
-      - checkout
+      - image: circleci/python:3.7
+        environment:
+
       - run:
           command: |
-            mv mock_repositories/* .
-            apk update && apk upgrade && apk add git && apk add build-base
-            pip install --upgrade pip
-            pip install -r requirements_pytest.txt
-            pycodestyle ./get_repos.py
-            pylint --disable=R0902,R0913,R0123,W0703 ./get_repos.py
-            pycodestyle ./test_get_repos.py --max-line-length=150
-            pylint --disable=C0301 ./test_get_repos.py
-            pytest -v
-  #run-staging:
-#    <<: *run
-#    environment:
-#      ENVIRONMENT: "staging"
-#  run-prod:
-#    <<: *run
-#    environment:
-#      ENVIRONMENT: "prod"
-#workflows:
-#  version: 2
-#  nightly:
-#    triggers:
-#      - schedule:
-#          cron: "0 * * * *"
-#          filters:
-#            branches:
-#              only:
-#                - master
-#    jobs:
-#      - run-prod
-#      - run-staging
-#  release-pipeline:
-#    jobs:
-#      - test
-#      - run-staging:
-#          requires:
-#            - test
-#          filters:
-#            branches:
-#              only:
-#                 - master
-##                 - CICD-148
-  #    - prod-approval:
-  #        type: approval
-  #        requires:
-  #          - run-staging
-  ##          branches:
-    #          only: master
-    #  - run-prod:
-    #      requires:
-    #        - prod-approval
-    #      filters:
-    #        branches:
-    #          only: master
+            sudo pip install pipenv
+            pipenv install
+  test:
+      - run:
+          command: |
+            pipenv run python manage.py test
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr1
