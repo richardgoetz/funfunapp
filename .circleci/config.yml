@@ -24,11 +24,11 @@ jobs:
             make login-docker |
             make pull-docker-image-glue-ci |
             unset AWS_ACCESS_KEY_ID |
-            
+
 
 
 workflows:
-  build-and-deploy:
+  build:
     jobs:
       - aws/build_PROD_AWS:
           account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
