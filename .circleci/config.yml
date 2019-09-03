@@ -6,11 +6,11 @@ jobs:
     steps:
       - checkout
       - run: sudo pip install --requirement requirements-dev.txt --upgrade
-      - run: echo export AWS_ACCESS_KEY_ID="${PROD_AWS_ACCESS_KEY_ID}" &&
-      - run: echo export AWS_SECRET_ACCESS_KEY="${PROD_AWS_SECRET_ACCESS_KEY}"  &&
-      - run: aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/id_rsa_knox_pyspark &&
+      - run: echo export AWS_ACCESS_KEY_ID="${PROD_AWS_ACCESS_KEY_ID}"
+      - run: echo export AWS_SECRET_ACCESS_KEY="${PROD_AWS_SECRET_ACCESS_KEY}"
+      - run: aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/id_rsa_knox_pyspark
               jq --raw-output --join-output '.SecretString' > ~/.ssh/id_rsa &&
-      - run: aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/docker_service_user_keys.json &&
+      - run: aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/docker_service_user_keys.json 
               jq --raw-output --join-output '.SecretString' > docker_service_user_keys.json &&
             unset AWS_ACCESS_KEY_ID &&
             unset AWS_SECRET_ACCESS_KEY &&
