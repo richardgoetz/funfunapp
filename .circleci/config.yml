@@ -11,11 +11,10 @@ jobs:
       - run: aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/id_rsa_knox_pyspark |
               jq --raw-output --join-output '.SecretString' > ~/.ssh/id_rsa &&
       - run: aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/docker_service_user_keys.json |
-              jq --raw-output --join-output '.SecretString' > docker_service_user_keys.json &&
-            unset AWS_ACCESS_KEY_ID &&
-            unset AWS_SECRET_ACCESS_KEY &&
-            export AWS_ACCESS_KEY_ID=`cat docker_service_user_keys.json | jq --raw-output '.aws_access_key_id'` &&
-            export AWS_SECRET_ACCESS_KEY=`cat docker_service_user_keys.json | jq --raw-output '.aws_secret_access_key'` &&
-            make login-docker &&
-            make pull-docker-image-glue-ci &&
-            unset AWS_ACCESS_KEY_ID &&
+              jq --raw-output --join-output '.SecretString' > docker_service_user_keys.json
+      - run: unset AWS_ACCESS_KEY_ID
+      - run: unset AWS_SECRET_ACCESS_KEY &&
+    - run:  echo export AWS_ACCESS_KEY_ID=`cat docker_service_user_keys.json | jq --raw-output '.aws_access_key_id'` &&
+    - run:  echo export AWS_SECRET_ACCESS_KEY=`cat docker_service_user_keys.json | jq --raw-output '.aws_secret_access_key'` &&
+    - run:  make login-docker &&
+    - run:  unset AWS_ACCESS_KEY_ID &&
