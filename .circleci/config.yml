@@ -11,3 +11,43 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            export AWS_ACCESS_KEY_ID="${PROD_AWS_ACCESS_KEY_ID}" |
+            export AWS_SECRET_ACCESS_KEY="${PROD_AWS_SECRET_ACCESS_KEY}"|
+            aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/id_rsa_knox_pyspark |
+              jq --raw-output --join-output '.SecretString' > ~/.ssh/id_rsa |
+            aws --output json --region us-east-1 secretsmanager get-secret-value --secret-id prod/docker_service_user_keys.json |
+              jq --raw-output --join-output '.SecretString' > docker_service_user_keys.json |
+            unset AWS_ACCESS_KEY_ID |
+            unset AWS_SECRET_ACCESS_KEY |
+            export AWS_ACCESS_KEY_ID=`cat docker_service_user_keys.json | jq --raw-output '.aws_access_key_id'` |
+            export AWS_SECRET_ACCESS_KEY=`cat docker_service_user_keys.json | jq --raw-output '.aws_secret_access_key'` |
+            make login-docker |
+            make pull-docker-image-glue-ci |
+            unset AWS_ACCESS_KEY_ID |
+            
+
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - aws/build_PROD_AWS:
+          account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+          repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          region: ${AWS_DEFAULT_REGION}
+          tag: "${CIRCLE_SHA1}"
+
+      - aws-ecs/STAGING_AWS:
+          requires:
+            - aws-ecr/build_and_push_image
+          aws-region: ${AWS_DEFAULT_REGION}
+          family: "${AWS_RESOURCE_NAME_PREFIX}-service"
+          cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
+          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
+
+        - aws-ecs/STAGING_AWS:
+                requires:
+                  - aws-ecr/build_and_push_image
+                aws-region: ${AWS_DEFAULT_REGION}
+                family: "${AWS_RESOURCE_NAME_PREFIX}-service"
+                cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
+                container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SH
